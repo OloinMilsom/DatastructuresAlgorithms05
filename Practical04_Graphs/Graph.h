@@ -61,6 +61,7 @@ public:
 	void breadthFirstSearch(Node* pStart, Node* pGoal, void (*pProcess)(Node*));
 	void ucs(Node* pStart, Node* pDest, void(*pVisitFunc)(Node*), std::vector<Node *>& path);
 
+	// functor struct for priority queue
 	struct NodeSearchCostCompare{
 	public:
 		bool operator()(Node * n1, Node * n2) {
@@ -371,69 +372,55 @@ void Graph<NodeType, ArcType>::breadthFirstSearch(Node* pStart, Node* pGoal, voi
 
 template<class NodeType, class ArcType>
 void Graph<NodeType, ArcType>::ucs(Node* pStart, Node* pDest, void(*pVisitFunc)(Node*), std::vector<Node *>& path){
-	//Let s = the starting node, g = goal or destination node
-	//Let pq = a new priority queue
-	//Initialise d[s] to 0
-	//For each node v in graph G
-	//	Initialise d[v] to infinity // don’t yet know the distances to these nodes
-
-	//Add s to the pq
-	//Mark(s)
-	//While the queue is not empty AND pq.top() != g
-	//	For each child node c of pq.top()
-	//		If(c != previous(pq.top()) // don’t go back to a predecessor
-	//			Let distC = w(pq.top(), c) + d[pq.top]
-	//			If(distC < d[c])
-	//				let d[c] = distC
-	//				Set previous pointer of c to pq.top()
-	//			End if
-	//			If(notMarked(c))
-	//				Add c to the pq
-	//				Mark(c)
-	//			End if
-	//		End if
-	//	End for
-	//	Remove pq.top()
-	//End while
 	if (pStart != 0) {
 		priority_queue<Node*, vector<Node *>, NodeSearchCostCompare> nodeQueue;
+
+		// set starting search distance to be 0
 		pStart->setSearchDistance(0);
-		for (list<Arc>::const_iterator iter = pStart->arcList().begin(); iter != pStart->arcList().end(); iter++)
+		for (int i = 0; i < m_count; i++)
 		{
-			(*iter).node()->setSearchDistance(9999999999);
+			// if not starting set to be large number
+			if (m_pNodes[i] != pStart)
+				m_pNodes[i]->setSearchDistance(9999999999);
+			// reset all previous pointers
+			m_pNodes[i]->setPrevious(nullptr);
 		}
 
+		// add start node to top of queue and mark it
 		nodeQueue.push(pStart);
 		pStart->setMarked(true);
 
+		// loop through the queue while there are nodes in it.
 		while (!nodeQueue.empty() && nodeQueue.top() != pDest) {
-			list<Arc>::const_iterator iter = nodeQueue.top()->arcList().begin();
-			list<Arc>::const_iterator endIter = nodeQueue.top()->arcList().end();
-
+			// print visiting current top of queue
 			pVisitFunc(nodeQueue.top());
 
+			// iterate through the children of the top of queue
+			list<Arc>::const_iterator iter = nodeQueue.top()->arcList().begin();
+			list<Arc>::const_iterator endIter = nodeQueue.top()->arcList().end();
 			for (; iter != endIter; iter++) {
 				if ((*iter).node() != nodeQueue.top()->getPrevious())
 				{
+					// if the distance of the current route is shorter than the distance of 
+					// the previous shortest route, change the distance and previous node accordingly
 					int dist = (*iter).weight() + nodeQueue.top()->getSearchDistance();
 					if (dist < (*iter).node()->getSearchDistance()){
 						(*iter).node()->setSearchDistance(dist);
-						(*iter).node()->setMarked(true);
 						(*iter).node()->setPrevious(nodeQueue.top());
-						if ((*iter).node() == pDest) {
-							pDest->setPrevious(nodeQueue.top());
-						}
 					}
+					// add all of the child nodes that have not been 
+					// marked into the queue
 					if (!(*iter).node()->marked()){
 						nodeQueue.push((*iter).node());
 						(*iter).node()->setMarked(true);
-						(*iter).node()->setPrevious(nodeQueue.top());
 					}
 				}
 			}
+			// dequeue the current node.
 			nodeQueue.pop();
 		}
 	}
+	// add path nodes onto the reference vector: path
 	Node * currNode = pDest;
 	while (currNode != nullptr)
 	{

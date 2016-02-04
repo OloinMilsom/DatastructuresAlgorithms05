@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	//graph.breadthFirst( graph.nodeArray()[0], visit );
 	//graph.breadthFirstSearch(graph.nodeArray()[0], graph.nodeArray()[15], visit);
 	vector<Node *> vec;
-	graph.ucs(graph.nodeArray()[4], graph.nodeArray()[1], visit, vec);
+	graph.ucs(graph.nodeArray()[2], graph.nodeArray()[4], visit, vec);
 	printPath(vec);
 
 	system("PAUSE");
