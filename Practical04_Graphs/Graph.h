@@ -381,7 +381,7 @@ void Graph<NodeType, ArcType>::ucs(Node* pStart, Node* pDest, void(*pVisitFunc)(
 		{
 			// if not starting set to be large number
 			if (m_pNodes[i] != pStart)
-				m_pNodes[i]->setSearchDistance(9999999999);
+				m_pNodes[i]->setSearchDistance(numeric_limits<int>::max());
 			// reset all previous pointers
 			m_pNodes[i]->setPrevious(nullptr);
 		}

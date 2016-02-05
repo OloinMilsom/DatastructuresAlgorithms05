@@ -24,7 +24,7 @@ private:
     NodeType m_data;
 
 // -------------------------------------------------------
-// Description: data inside the node
+// Description: the distance of the search to this vertex
 // -------------------------------------------------------
 	int m_searchDistance;
 
